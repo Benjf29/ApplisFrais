@@ -29,6 +29,8 @@ class A_visiteur extends CI_Model {
 		// obtention de l'id de l'utilisateur mémorisé en session
 		$idVisiteur = $this->session->userdata('idUser');
 		
+		
+		
 		// contrôle de l'existence des 6 dernières fiches et création si nécessaire
 		foreach ($lesMois as $unMois){
 			if(!$this->dataAccess->ExisteFiche($idVisiteur, $unMois)) $this->dataAccess->creeFiche($idVisiteur, $unMois);

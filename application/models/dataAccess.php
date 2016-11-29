@@ -54,7 +54,17 @@ class DataAccess extends CI_Model {
 		}
 		return $lesLignes; 
 	}
+	
+	public function getProfil($login,$mdp)
+	{
+		$req = "select visiteur.profil as profil
+				from visiteur
+				where visiteur.login=? and visiteur.mdp=?";
+		$rs = $this->db->query($req, array ($login, $mdp));
+		$ligne = $rs->first_row('array');
+		return $ligne;
 		
+	}
 	/**
 	 * Retourne le nombre de justificatif d'un visiteur pour un mois donné
 	 * 
@@ -68,7 +78,7 @@ class DataAccess extends CI_Model {
 				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->result_array();
-		return $laLigne['nb'];
+		return $laLigne;
 	}
 		
 	/**
@@ -195,6 +205,22 @@ class DataAccess extends CI_Model {
 				$this->majEtatFicheFrais($idVisiteur, $mois,'CL');
 		}
 	}
+	
+	public function validFiche($idVisiteur,$mois){
+		//met à 'CL' son champs idEtat
+		$laFiche = $this->getLesInfosFicheFrais($idVisiteur,$mois);
+		if($laFiche['idEtat']=='CL'){
+			$this->majEtatFicheFrais($idVisiteur, $mois,'VA');
+		}
+	}
+	
+	public function refuFiche($idVisiteur,$mois){
+		//met à 'CL' son champs idEtat
+		$laFiche = $this->getLesInfosFicheFrais($idVisiteur,$mois);
+		if($laFiche['idEtat']=='CL'){
+			$this->majEtatFicheFrais($idVisiteur, $mois,'RE');
+		}
+	}
 
 	/**
 	 * Crée un nouveau frais hors forfait pour un visiteur un mois donné
@@ -299,6 +325,14 @@ class DataAccess extends CI_Model {
 		$lesFiches = $rs->result_array();
 		return $lesFiches;
 	}
+	public function getFichesCon () {
+		$req = "select idVisiteur, mois, montantValide, dateModif, id, libelle
+		from  fichefrais inner join Etat on ficheFrais.idEtat = Etat.id
+		order by mois desc";
+		$rs = $this->db->query($req);
+		$lesFiches = $rs->result_array();
+		return $lesFiches;
+	}
 	
 	/**
 	 * Calcule le montant total de la fiche pour un visiteur et un mois donnés
@@ -343,5 +377,7 @@ class DataAccess extends CI_Model {
 				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
 		$this->db->simple_query($req);
 	}
+	
+	
 }
 ?>

@@ -18,7 +18,9 @@ class C_default extends CI_Controller {
 	public function index()
 	{
 		$this->load->model('authentif');
-		
+		$this->load->helper('url');
+		$login = $this->input->post('login');
+		$mdp = $this->input->post('mdp');
 		if (!$this->authentif->estConnecte()) 
 		{
 			$data = array();
@@ -26,8 +28,19 @@ class C_default extends CI_Controller {
 		}
 		else
 		{
-			$this->load->helper('url');
-			redirect('/c_visiteur/');
+			$profil = $this->dataAccess->getProfil($login,$mdp);
+			$profil = $profil['profil'];
+			if ($profil == 1)
+			{
+				
+				redirect('/c_visiteur/');
+				
+			}
+			else {
+				redirect('/c_comptable/');
+				
+			}
+			
 		}
 	}
 	
