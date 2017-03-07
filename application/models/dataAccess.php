@@ -20,9 +20,9 @@ class DataAccess extends CI_Model {
 	 * @return l'id, le nom et le prénom sous la forme d'un tableau associatif 
 	*/
 	public function getInfosVisiteur($login, $mdp){
-		$req = "select visiteur.id as id, visiteur.nom as nom, visiteur.prenom as prenom 
-				from visiteur 
-				where visiteur.login=? and visiteur.mdp=?";
+		$req = "select Utilisateur.id as id, Utilisateur.nom as nom, Utilisateur.prenom as prenom 
+				from Utilisateur 
+				where Utilisateur.login=? and Utilisateur.mdp=?";
 		$rs = $this->db->query($req, array ($login, $mdp));
 		$ligne = $rs->first_row('array'); 
 		return $ligne;
@@ -34,16 +34,16 @@ class DataAccess extends CI_Model {
 	 * La boucle foreach ne peut être utilisée ici car on procède
 	 * à une modification de la structure itérée - transformation du champ date-
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @return tous les champs des lignes de frais hors forfait sous la forme d'un tableau associatif 
 	*/
-	public function getLesLignesHorsForfait($idVisiteur,$mois){
+	public function getLesLignesHorsForfait($idUtilisateur,$mois){
 		$this->load->model('functionsLib');
 
 		$req = "select * 
 				from lignefraishorsforfait 
-				where lignefraishorsforfait.idvisiteur ='$idVisiteur' 
+				where lignefraishorsforfait.idUtilisateur ='$idUtilisateur' 
 					and lignefraishorsforfait.mois = '$mois' ";	
 		$rs = $this->db->query($req);
 		$lesLignes = $rs->result_array();
@@ -57,9 +57,9 @@ class DataAccess extends CI_Model {
 	
 	public function getProfil($login,$mdp)
 	{
-		$req = "select visiteur.profil as profil
-				from visiteur
-				where visiteur.login=? and visiteur.mdp=?";
+		$req = "select Utilisateur.profil as profil
+				from Utilisateur
+				where Utilisateur.login=? and Utilisateur.mdp=?";
 		$rs = $this->db->query($req, array ($login, $mdp));
 		$ligne = $rs->first_row('array');
 		return $ligne;
@@ -68,14 +68,14 @@ class DataAccess extends CI_Model {
 	/**
 	 * Retourne le nombre de justificatif d'un visiteur pour un mois donné
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @return le nombre entier de justificatifs 
 	*/
-	public function getNbjustificatifs($idVisiteur, $mois){
+	public function getNbjustificatifs($idUtilisateur, $mois){
 		$req = "select fichefrais.nbjustificatifs as nb 
 				from  fichefrais 
-				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
+				where fichefrais.idUtilisateur ='$idUtilisateur' and fichefrais.mois = '$mois'";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->result_array();
 		return $laLigne;
@@ -85,20 +85,21 @@ class DataAccess extends CI_Model {
 	 * Retourne sous forme d'un tableau associatif toutes les lignes de frais au forfait
 	 * concernées par les deux arguments
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @return l'id, le libelle et la quantité sous la forme d'un tableau associatif 
 	*/
-	public function getLesLignesForfait($idVisiteur, $mois){
-		$req = "select fraisforfait.id as idfrais, fraisforfait.libelle as libelle, lignefraisforfait.quantite as quantite 
+	public function getLesLignesForfait($idUtilisateur, $mois){
+		$req = "select fraisforfait.id as idfrais, fraisforfait.libelle as libelle, lignefraisforfait.quantite as quantite ,fraisforfait.montant as montant
 				from lignefraisforfait inner join fraisforfait 
 					on fraisforfait.id = lignefraisforfait.idfraisforfait
-				where lignefraisforfait.idvisiteur ='$idVisiteur' and lignefraisforfait.mois='$mois' 
+				where lignefraisforfait.idUtilisateur ='$idUtilisateur' and lignefraisforfait.mois='$mois' 
 				order by lignefraisforfait.idfraisforfait";	
 		$rs = $this->db->query($req);
 		$lesLignes = $rs->result_array();
 		return $lesLignes; 
 	}
+	
 		
 	/**
 	 * Retourne tous les FraisForfait
@@ -116,17 +117,17 @@ class DataAccess extends CI_Model {
 	 * Met à jour la table ligneFraisForfait pour un visiteur et
 	 * un mois donné en enregistrant les nouveaux montants
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @param $lesFrais tableau associatif de clé idFrais et de valeur la quantité pour ce frais
 	*/
-	public function majLignesForfait($idVisiteur, $mois, $lesFrais){
+	public function majLignesForfait($idUtilisateur, $mois, $lesFrais){
 		$lesCles = array_keys($lesFrais);
 		foreach($lesCles as $unIdFrais){
 			$qte = $lesFrais[$unIdFrais];
 			$req = "update lignefraisforfait 
 					set lignefraisforfait.quantite = $qte
-					where lignefraisforfait.idvisiteur = '$idVisiteur' 
+					where lignefraisforfait.idUtilisateur = '$idUtilisateur' 
 						and lignefraisforfait.mois = '$mois'
 						and lignefraisforfait.idfraisforfait = '$unIdFrais'";
 			$this->db->simple_query($req);
@@ -137,13 +138,13 @@ class DataAccess extends CI_Model {
 	 * met à jour le nombre de justificatifs de la table ficheFrais
 	 * pour le mois et le visiteur concerné
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	*/
-	public function majNbJustificatifs($idVisiteur, $mois, $nbJustificatifs){
+	public function majNbJustificatifs($idUtilisateur, $mois, $nbJustificatifs){
 		$req = "update fichefrais 
 				set nbjustificatifs = $nbJustificatifs 
-				where fichefrais.idvisiteur = '$idVisiteur' 
+				where fichefrais.idUtilisateur = '$idUtilisateur' 
 					and fichefrais.mois = '$mois'";
 		$this->db->simple_query($req);	
 	}
@@ -151,16 +152,16 @@ class DataAccess extends CI_Model {
 	/**
 	 * Teste si un visiteur possède une fiche de frais pour le mois passé en argument
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @return vrai si la fiche existe, ou faux sinon
 	*/	
-	public function existeFiche($idVisiteur,$mois)
+	public function existeFiche($idUtilisateur,$mois)
 	{
 		$ok = false;
 		$req = "select count(*) as nblignesfrais 
 				from fichefrais 
-				where fichefrais.mois = '$mois' and fichefrais.idvisiteur = '$idVisiteur'";
+				where fichefrais.mois = '$mois' and fichefrais.idUtilisateur = '$idUtilisateur'";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->first_row('array');
 		if($laLigne['nblignesfrais'] != 0){
@@ -174,19 +175,19 @@ class DataAccess extends CI_Model {
 	 * L'état de la fiche est mis à 'CR'
 	 * Lles lignes de frais forfait sont affectées de quantités nulles et du montant actuel de FraisForfait
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	*/
-	public function creeFiche($idVisiteur,$mois){
-		$req = "insert into fichefrais(idvisiteur,mois,nbJustificatifs,montantValide,dateModif,idEtat) 
-				values('$idVisiteur','$mois',0,0,now(),'CR')";
+	public function creeFiche($idUtilisateur,$mois){
+		$req = "insert into fichefrais(idUtilisateur,mois,nbJustificatifs,montantValide,dateModif,idEtat) 
+				values('$idUtilisateur','$mois',0,0,now(),'CR')";
 		$this->db->simple_query($req);
 		$lesFF = $this->getLesFraisForfait();
 		foreach($lesFF as $uneLigneFF){
 			$unIdFrais = $uneLigneFF['idfrais'];
 			$montantU = $uneLigneFF['montant'];
-			$req = "insert into lignefraisforfait(idvisiteur,mois,idFraisForfait,quantite, montantApplique) 
-					values('$idVisiteur','$mois','$unIdFrais',0, $montantU)";
+			$req = "insert into lignefraisforfait(idUtilisateur,mois,idFraisForfait,quantite, montantApplique) 
+					values('$idUtilisateur','$mois','$unIdFrais',0, $montantU)";
 			$this->db->simple_query($req);
 		 }
 	}
@@ -195,30 +196,30 @@ class DataAccess extends CI_Model {
 	 * Signe une fiche de frais en modifiant son état de "CR" à "CL"
 	 * Ne fait rien si l'état initial n'est pas "CR"
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	*/
-	public function signeFiche($idVisiteur,$mois){
+	public function signeFiche($idUtilisateur,$mois){
 		//met à 'CL' son champs idEtat
-		$laFiche = $this->getLesInfosFicheFrais($idVisiteur,$mois);
+		$laFiche = $this->getLesInfosFicheFrais($idUtilisateur,$mois);
 		if($laFiche['idEtat']=='CR'){
-				$this->majEtatFicheFrais($idVisiteur, $mois,'CL');
+				$this->majEtatFicheFrais($idUtilisateur, $mois,'CL');
 		}
 	}
 	
-	public function validFiche($idVisiteur,$mois){
+	public function validFiche($idUtilisateur,$mois){
 		//met à 'CL' son champs idEtat
-		$laFiche = $this->getLesInfosFicheFrais($idVisiteur,$mois);
+		$laFiche = $this->getLesInfosFicheFraisAll($idUtilisateur,$mois);
 		if($laFiche['idEtat']=='CL'){
-			$this->majEtatFicheFrais($idVisiteur, $mois,'VA');
+			$this->majEtatFicheFrais($idUtilisateur, $mois,'VA');
 		}
 	}
 	
-	public function refuFiche($idVisiteur,$mois){
+	public function refuFiche($idUtilisateur,$mois){
 		//met à 'CL' son champs idEtat
-		$laFiche = $this->getLesInfosFicheFrais($idVisiteur,$mois);
+		$laFiche = $this->getFichesCon();
 		if($laFiche['idEtat']=='CL'){
-			$this->majEtatFicheFrais($idVisiteur, $mois,'RE');
+			$this->majEtatFicheFrais($idUtilisateur, $mois,'RE');
 		}
 	}
 
@@ -226,18 +227,18 @@ class DataAccess extends CI_Model {
 	 * Crée un nouveau frais hors forfait pour un visiteur un mois donné
 	 * à partir des informations fournies en paramètre
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @param $libelle : le libelle du frais
 	 * @param $date : la date du frais au format français jj//mm/aaaa
 	 * @param $montant : le montant
 	*/
-	public function creeLigneHorsForfait($idVisiteur,$mois,$libelle,$date,$montant){
+	public function creeLigneHorsForfait($idUtilisateur,$mois,$libelle,$date,$montant){
 		$this->load->model('functionsLib');
 		
 		$dateFr = $this->functionsLib->dateFrancaisVersAnglais($date);
 		$req = "insert into lignefraishorsforfait 
-				values('','$idVisiteur','$mois','$libelle','$dateFr','$montant')";
+				values('','$idUtilisateur','$mois','$libelle','$dateFr','$montant')";
 		$this->db->simple_query($req);
 	}
 		
@@ -255,13 +256,13 @@ class DataAccess extends CI_Model {
 	/**
 	 * Retourne les mois pour lesquel un visiteur a une fiche de frais
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @return un tableau associatif de clé un mois -aaaamm- et de valeurs l'année et le mois correspondant 
 	*/
-	public function getLesMoisDisponibles($idVisiteur){
+	public function getLesMoisDisponibles($idUtilisateur){
 		$req = "select fichefrais.mois as mois 
 				from  fichefrais 
-				where fichefrais.idvisiteur ='$idVisiteur' 
+				where fichefrais.idUtilisateur ='$idUtilisateur' 
 				order by fichefrais.mois desc ";
 		$rs = $this->db->query($req);
 		$lesMois =array();
@@ -283,15 +284,24 @@ class DataAccess extends CI_Model {
 	/**
 	 * Retourne les informations d'une fiche de frais d'un visiteur pour un mois donné
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @return un tableau avec des champs de jointure entre une fiche de frais et la ligne d'état 
 	*/	
-	public function getLesInfosFicheFrais($idVisiteur,$mois){
+	public function getLesInfosFicheFrais($idUtilisateur,$mois){
 		$req = "select ficheFrais.idEtat as idEtat, ficheFrais.dateModif as dateModif, 
 					ficheFrais.nbJustificatifs as nbJustificatifs, ficheFrais.montantValide as montantValide, etat.libelle as libEtat 
 				from  fichefrais inner join Etat on ficheFrais.idEtat = Etat.id 
-				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
+				where fichefrais.idUtilisateur ='$idUtilisateur' and fichefrais.mois = '$mois'";
+		$rs = $this->db->query($req);
+		$laLigne = $rs->first_row('array');
+		return $laLigne;
+	}
+	public function getLesInfosFicheFraisAll($idUtilisateur,$mois){
+		$req = "select ficheFrais.idEtat as idEtat, ficheFrais.dateModif as dateModif,
+		ficheFrais.nbJustificatifs as nbJustificatifs, ficheFrais.montantValide as montantValide, etat.libelle as libEtat
+		from  fichefrais inner join Etat on ficheFrais.idEtat = Etat.id
+		";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->first_row('array');
 		return $laLigne;
@@ -300,33 +310,33 @@ class DataAccess extends CI_Model {
 	/**
 	 * Modifie l'état et la date de modification d'une fiche de frais
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois sous la forme aaaamm
 	 * @param $etat : le nouvel état de la fiche 
 	 */
-	public function majEtatFicheFrais($idVisiteur,$mois,$etat){
+	public function majEtatFicheFrais($idUtilisateur,$mois,$etat){
 		$req = "update ficheFrais 
 				set idEtat = '$etat', dateModif = now() 
-				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
+				where fichefrais.idUtilisateur ='$idUtilisateur' and fichefrais.mois = '$mois'";
 		$this->db->simple_query($req);
 	}
 	
 	/**
 	 * Obtient toutes les fiches (sans détail) d'un visiteur donné 
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	*/
-	public function getFiches ($idVisiteur) {
-		$req = "select idVisiteur, mois, montantValide, dateModif, id, libelle
+	public function getFiches ($idUtilisateur) {
+		$req = "select idUtilisateur, mois, montantValide, dateModif, id, libelle
 				from  fichefrais inner join Etat on ficheFrais.idEtat = Etat.id 
-				where fichefrais.idvisiteur = '$idVisiteur'
+				where fichefrais.idUtilisateur = '$idUtilisateur'
 				order by mois desc";
 		$rs = $this->db->query($req);
 		$lesFiches = $rs->result_array();
 		return $lesFiches;
 	}
 	public function getFichesCon () {
-		$req = "select idVisiteur, mois, montantValide, dateModif, id, libelle
+		$req = "select idUtilisateur, mois, montantValide, dateModif, id, libelle
 		from  fichefrais inner join Etat on ficheFrais.idEtat = Etat.id
 		order by mois desc";
 		$rs = $this->db->query($req);
@@ -337,15 +347,15 @@ class DataAccess extends CI_Model {
 	/**
 	 * Calcule le montant total de la fiche pour un visiteur et un mois donnés
 	 * 
-	 * @param $idVisiteur 
+	 * @param $idUtilisateur 
 	 * @param $mois
 	 * @return le montant total de la fiche
 	*/
-	public function totalFiche ($idVisiteur, $mois) {
+	public function totalFiche ($idUtilisateur, $mois) {
 		// obtention du total hors forfait
 		$req = "select SUM(montant) as totalHF
 				from  lignefraishorsforfait 
-				where idvisiteur = '$idVisiteur'
+				where idUtilisateur = '$idUtilisateur'
 					and mois = '$mois'";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->first_row('array');
@@ -354,7 +364,7 @@ class DataAccess extends CI_Model {
 		// obtention du total forfaitisé
 		$req = "select SUM(montantApplique * quantite) as totalF
 				from  lignefraisforfait 
-				where idvisiteur = '$idVisiteur'
+				where idUtilisateur = '$idUtilisateur'
 					and mois = '$mois'";
 		$rs = $this->db->query($req);
 		$laLigne = $rs->first_row('array');
@@ -366,15 +376,15 @@ class DataAccess extends CI_Model {
 	/**
 	 * Modifie le montantValide et la date de modification d'une fiche de frais
 	 * 
-	 * @param $idVisiteur : l'id du visiteur
+	 * @param $idUtilisateur : l'id du visiteur
 	 * @param $mois : mois sous la forme aaaamm
 	 */
-	public function recalculeMontantFiche($idVisiteur,$mois){
+	public function recalculeMontantFiche($idUtilisateur,$mois){
 	
-		$totalFiche = $this->totalFiche($idVisiteur,$mois);
+		$totalFiche = $this->totalFiche($idUtilisateur,$mois);
 		$req = "update ficheFrais 
 				set montantValide = '$totalFiche', dateModif = now() 
-				where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
+				where fichefrais.idUtilisateur ='$idUtilisateur' and fichefrais.mois = '$mois'";
 		$this->db->simple_query($req);
 	}
 	

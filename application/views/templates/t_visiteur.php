@@ -2,22 +2,18 @@
 	$this->load->helper('url');
 	$v_path = base_url('application/views');
 ?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
-
 	<head>
 		<title>Intranet du Laboratoire Galaxy-Swiss Bourdin</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<link href="<?php echo $v_path.'/templates/css/styles.css'?>" rel="stylesheet" type="text/css" />
+		<script src="<?php echo $v_path.'/templates/js/javascript.js'?>"  />
 
-		<script type="JavaScript">
-			function hideNotify() {
-				document.getElementById("notify").style.display = "none";
-			}
-		</script>
-		
+<script >function hideNotify() {
+	document.getElementById("notify").style.display = "none";
+}</script>
 	</head>
 
 	<body onload="setTimeout(hideNotify,7000);">

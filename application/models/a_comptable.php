@@ -127,11 +127,11 @@ class A_comptable extends CI_Model {
 	    $this->dataAccess->signeFiche($idVisiteur, $mois);
 	}
 
-	public function validFiche($idVisiteur, $mois)
+	public function validFiche($idVisiteur, $id)
 	{	// TODO : s'assurer que les paramètres reçus sont cohérents avec ceux mémorisés en session
 	// TODO : intégrer une fonctionnalité d'impression PDF de la fiche
 	
-	$this->dataAccess->validFiche($idVisiteur, $mois);
+	$this->dataAccess->validFiche($idVisiteur, $id);
 	}
 	
 	public function refuFiche($idVisiteur, $mois)
@@ -139,6 +139,7 @@ class A_comptable extends CI_Model {
 	// TODO : intégrer une fonctionnalité d'impression PDF de la fiche
 	
 	$this->dataAccess->refuFiche($idVisiteur, $mois);
+	
 	}
 	public function refuFicheCom($idVisiteur, $mois)
 	{	// TODO : s'assurer que les paramètres reçus sont cohérents avec ceux mémorisés en session

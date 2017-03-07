@@ -50,7 +50,7 @@ class C_comptable extends CI_Controller {
 				$idVisiteur = $this->session->userdata('idUser');
 				$this->a_comptable->mesFiches($idVisiteur);
 			}
-			elseif ($action == 'mesFichesCon')		// mesFiches demandÃ© : on active la fonction mesFiches du modÃ¨le visiteur
+			elseif ($action == 'mesFichesCon')		// mesFiches demandÃ© : on active la fonction mesFiches du modÃ¨le comptable
 			{
 				$this->load->model('a_comptable');
 			
@@ -178,8 +178,14 @@ class C_comptable extends CI_Controller {
 				$idVisiteur = $this->session->userdata('idUser');
 				$this->a_comptable->validFiche($idVisiteur, $mois);
 				
-				// ... et on revient Ã  mesFiches
-				$this->a_comptable->mesFiches($idVisiteur, "La fiche $mois a été valider.");
+				
+				$this->load->model('a_comptable');
+			
+				// on n'est pas en mode "modification d'une fiche"
+				$this->session->unset_userdata('mois');
+			
+				$idVisiteur = $this->session->userdata('idUser');
+				$this->a_comptable->mesFichesCon($idVisiteur, "La fiche $mois a été valider.");
 			}
 			elseif ($action == 'refuFiche'){
 				$this->load->model('a_comptable');

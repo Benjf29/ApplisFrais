@@ -23,6 +23,7 @@ body{
 	padding: 0em;
 	border-collapse: separate;
 }
+
 #pied{
   clear : both;
 	border : solid 0.2em #980101;
@@ -255,6 +256,10 @@ table.listeLegere {
     margin-bottom : 0.5em;
 }
 
+table.listeElementForfaitise{
+	background-color : #FFFFFF;
+}
+
 table.listeLegere caption {
   font-size : 1.1em;
   text-align : left;
@@ -295,7 +300,11 @@ table.listeLegere td.montant{
 table.listeLegere th.eltForfait{
   color:black;
 }
-
+textarea.comment 
+ {
+    width: 300px;
+    height: 150px;
+}
 #contenu h2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 14px;

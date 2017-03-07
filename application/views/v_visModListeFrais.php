@@ -12,21 +12,40 @@
 		  
 			<fieldset>
 				<legend>Eléments forfaitisés</legend>
-				<?php
-					foreach ($lesFraisForfait as $unFrais)
-					{
-						$idFrais = $unFrais['idfrais'];
-						$libelle = $unFrais['libelle'];
-						$quantite = $unFrais['quantite'];
+				<table>
+				<thead>
+					<th>Quantite</th>
+					<th>Montant</th>
+					<th>Total</th>
 
-						echo 
-						'<p>
-							<label for="'.$idFrais.'">'.$libelle.'</label>
-							<input type="text" id="'.$idFrais.'" name="lesFrais['.$idFrais.']" size="10" maxlength="5" value="'.$quantite.'" />
-						</p>
-						';
-					}
+				</thead>
+				<tbody>
+				<?php
+				
+				foreach ( $lesFraisForfait as $unFrais ) {
+					$idFrais = $unFrais ['idfrais'];
+					$libelle = $unFrais ['libelle'];
+					$quantite = $unFrais ['quantite'];
+					$montant = $unFrais ['montant'];
+						
+					
+					echo '<tr>
+					<td><label for="' . $idFrais . '">' . $libelle . '</label><input onchange="calculFrais()" type="text" id="' . $idFrais . '" name="lesFrais[' . $idFrais . ']" size="10" maxlength="5" value="' . $quantite . '"  /></td>
+					<td><label id="coef' . $idFrais . '" for="' . $idFrais . '">' . $montant . '</label></td>
+					<td><label id="total' . $idFrais . '"></label></td>
+					</tr>
+					';
+					
+						
+					
+				}
 				?>
+							
+								
+				
+			</tbody>
+			</table>
+			<label>Total des frais</label></td><td><label id="totalFrais"></label>
 			</fieldset>
 		</div>
 		<div class="piedForm">
@@ -54,7 +73,7 @@
 				$date = $unFraisHorsForfait['date'];
 				$montant=$unFraisHorsForfait['montant'];
 				$id = $unFraisHorsForfait['id'];
-				echo 
+				echo 	
 				'<tr>
 					<td class="date">'.$date.'</td>
 					<td class="libelle">'.$libelle.'</td>
