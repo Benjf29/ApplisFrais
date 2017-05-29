@@ -28,8 +28,8 @@
 				$modLink= '';
 
 				if ($uneFiche['id'] == 'CL') {
-					$validLink = anchor('c_comptable/validFiche/'.$uneFiche['mois'], 'Valider',  'title="Signer"onclick="return confirm(\'Voulez-vous vraiment valider cette fiche ?\');"');
-					$denyLink = anchor('c_comptable/refuFicheCom/'.$uneFiche['mois'], 'Refuser',  'title="Modifier la fiche" onclick="return confirm(\'Voulez-vous vraiment refuser cette fiche ?\');"');
+					$validLink = anchor('c_comptable/validFiche/'.$uneFiche['mois'].'/'.$uneFiche['idUtilisateur'], 'Valider',  'title="Signer"onclick="return confirm(\'Voulez-vous vraiment valider cette fiche ?\');"');
+					$denyLink = anchor('c_comptable/refuFicheCom/'.$uneFiche['mois'] .'/'.$uneFiche['idUtilisateur'], 'Refuser',  'title="Modifier la fiche" onclick="return confirm(\'Voulez-vous vraiment refuser cette fiche ?\');"');
 					$modLink = anchor('c_comptable/modFiche/'.$uneFiche['mois'], 'modifier',  'title="Modifier la fiche"');
 					
 					echo

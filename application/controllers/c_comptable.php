@@ -176,7 +176,7 @@ class C_comptable extends CI_Controller {
 				$mois = $params[0];
 				// obtention de l'id utilisateur courant et du mois concernÃ©
 				$idVisiteur = $this->session->userdata('idUser');
-				$this->a_comptable->validFiche($idVisiteur, $mois);
+				$this->a_comptable->validFiche($params[1], $mois);
 				
 				
 				$this->load->model('a_comptable');
@@ -185,28 +185,30 @@ class C_comptable extends CI_Controller {
 				$this->session->unset_userdata('mois');
 			
 				$idVisiteur = $this->session->userdata('idUser');
-				$this->a_comptable->mesFichesCon($idVisiteur, "La fiche $mois a été valider.");
+				$this->a_comptable->mesFichesCon($idVisiteur, "La fiche $mois  a été valider.");
 			}
 			elseif ($action == 'refuFiche'){
 				$this->load->model('a_comptable');
 			
 				// obtention du mois de la fiche Ã  signer qui doit avoir Ã©tÃ© transmis
 				// en second paramÃ¨tre
-				$mois = $params[0];
 				// obtention de l'id utilisateur courant et du mois concernÃ©
-				$idVisiteur = $this->session->userdata('idUser');
-				$this->a_comptable->refuFiche($idVisiteur, $mois);
-			
+
+						$idUtilisateur = $this->input->post('idUtilisateur');
+						$mois = $this->input->post('mois');
+						$commentaire =  $this->input->post('comment');
+				
+				$this->a_comptable->refuFiche($idUtilisateur,$mois,$commentaire);
+$idVisiteur = $this->session->userdata('idUser');
+				$this->a_comptable->mesFichesCon($idVisiteur,"La fiche $mois a été refusé");				
 				// ... et on revient Ã  mesFiches
 			}
 			elseif ($action == 'refuFicheCom'){
 				$this->load->model('a_comptable');
-					
-				// obtention du mois de la fiche Ã  signer qui doit avoir Ã©tÃ© transmis
-				// en second paramÃ¨tre
+				
 				$mois = $params[0];
 				// obtention de l'id utilisateur courant et du mois concernÃ©
-				$idVisiteur = $this->session->userdata('idUser');
+				$idVisiteur = $params[1]		;
 				$this->a_comptable->refuFicheCom($idVisiteur, $mois);
 				
 			}

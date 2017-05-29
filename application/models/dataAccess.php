@@ -210,17 +210,19 @@ class DataAccess extends CI_Model {
 	public function validFiche($idUtilisateur,$mois){
 		//met à 'CL' son champs idEtat
 		$laFiche = $this->getLesInfosFicheFraisAll($idUtilisateur,$mois);
+		$this->majEtatFicheFrais($idUtilisateur, $mois,'VA');
+		
 		if($laFiche['idEtat']=='CL'){
-			$this->majEtatFicheFrais($idUtilisateur, $mois,'VA');
 		}
 	}
 	
-	public function refuFiche($idUtilisateur,$mois){
-		//met à 'CL' son champs idEtat
-		$laFiche = $this->getFichesCon();
-		if($laFiche['idEtat']=='CL'){
-			$this->majEtatFicheFrais($idUtilisateur, $mois,'RE');
-		}
+	public function refuFiche($idUtilisateur,$mois,$commentaire){
+		
+		
+		$req = "update ficheFrais 
+				set idEtat = 'RE', dateModif = now(),motifRefus = '$commentaire' 
+				where fichefrais.idUtilisateur ='$idUtilisateur' and fichefrais.mois = '$mois'";
+		$this->db->simple_query($req);
 	}
 
 	/**
